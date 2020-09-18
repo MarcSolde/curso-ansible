@@ -1,0 +1,13 @@
+ - name: update repos
+      apt: update-cache=yes
+    
+- name: install or update packages
+  apt: 
+    pkg: "{{install_list}}"
+    state: latest
+
+- name: install or update packages
+  apt:
+    name: nginx
+    state: latest
+  register: nginx_updated

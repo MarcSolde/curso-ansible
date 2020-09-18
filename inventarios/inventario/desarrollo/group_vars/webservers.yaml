@@ -1,0 +1,8 @@
+nginx_port: 80
+nginx_web_path: /web
+install_list:
+    - git
+    - nginx
+    - curl
+    - ufw
+    

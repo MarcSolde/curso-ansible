@@ -1,0 +1,16 @@
+all:
+    hosts:
+        proxy.curso.com:
+            so: freebsd
+    children:
+        servidores_aplicaciones:
+            hosts:
+        servidores_bds:
+            children:
+                servidores_mysql:
+                    hosts:
+                servidores_oracle:
+                    hosts:
+        servidores_web:
+            hosts:
+            

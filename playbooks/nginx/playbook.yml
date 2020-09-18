@@ -1,0 +1,83 @@
+- hosts: all
+  remote_user: root
+  vars:
+    mensaje_nginx: nginx
+    install_state: latest
+    nginx_web_path: /web
+
+  tasks:
+    - name: update repos
+      apt: update-cache=yes
+    
+    - name: install or update packages
+      apt: 
+        pkg:
+          - git
+          - curl
+          - ufw
+        state: latest
+    
+    - name: install or update packages
+      apt:
+        name: nginx
+        state: latest
+      register: nginx_updated
+      
+    - name: Generar fichero conf nginx
+      template:
+        src: nginx.template
+        dest: /etc/nginx/conf.d/nginx.conf
+        mode: 0400
+      register: configuracion
+
+    - name: clonar web de git
+      git:
+        repo: https://github.com/IvanciniGT/webEjemploAnsible
+        dest: "{{nginx_web_path}}"
+    
+    - name: start nginx service
+      service:
+        name: nginx
+        state: started
+    
+    - name: start nginx service
+      service:
+        name: nginx
+        state: restarted
+      when: configuracion is changed or nginx_updated is changed
+    # abrir puerto firewall
+    
+  #  - name: asegurarme que el ufw esta up
+  #    ufw:
+  #      state: enabled
+  #      policy: deny
+    
+  #  - name: allow port on ufw
+  #    ufw:
+  #      rule: allow
+  #      port: 80
+  #      proto: tcp
+        
+    - name: asegurarme que el puerto 80 esta funcionando
+      wait_for:
+        host: "{{ansible_hostname}}"
+        port: "{{nginx_port}}"
+        timeout: 10
+        state: started
+        delay: 2
+        connect_timeout: 2 #Tiempo entre intentos
+    
+#    - name: check if the service is up and running
+#      shell:
+#        cmd: curl localhost:80
+#      register: curlResult
+#      failed_when: "{{curlResult.stdout|}}"
+      
+    - name: print curl's result
+      uri:
+        url: "http://{{ansible_hostname}}"
+        port: "{{nginx_port}}"
+        return_content: yes
+      register: uriResult 
+      failed_when: "'{{mensaje_nginx}}' not in uriResult.content "
+      

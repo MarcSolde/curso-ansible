@@ -1,0 +1,7 @@
+---
+# vars file for webserver
+install_list:
+    - git
+    - nginx
+    - curl
+    - ufw

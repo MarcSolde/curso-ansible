@@ -1,0 +1,22 @@
+- name: asegurarme que el puerto 80 esta funcionando
+  wait_for:
+    host: "{{ansible_hostname}}"
+    port: "{{nginx_port}}"
+    timeout: 10
+    state: started
+    delay: 2
+    connect_timeout: 2 #Tiempo entre intentos
+
+#    - name: check if the service is up and running
+#      shell:
+#        cmd: curl localhost:80
+#      register: curlResult
+#      failed_when: "{{curlResult.stdout|}}"
+  
+- name: print curl's result
+  uri:
+    url: "http://{{ansible_hostname}}"
+    port: "{{nginx_port}}"
+    return_content: yes
+  register: uriResult 
+  failed_when: "'{{nginx_test_message}}' not in uriResult.content "
